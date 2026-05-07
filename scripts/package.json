@@ -5,9 +5,13 @@
   "type": "module",
   "scripts": {
     "hello": "tsx ./src/hello.ts",
+    "extract": "tsx ./src/extract-claims.ts",
+    "detect": "tsx ./src/detect-contradictions.ts",
+    "pipeline": "pnpm run extract && pnpm run detect",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.78.0",
     "@types/node": "catalog:",
     "tsx": "catalog:"
   }

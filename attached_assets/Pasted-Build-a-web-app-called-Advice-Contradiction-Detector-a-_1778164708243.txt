@@ -1,0 +1,261 @@
+Build a web app called "Advice Contradiction Detector" — a tool that analyzes Lenny Rachitsky's podcast transcripts using AI to surface genuine disagreements between guests on the same product, growth, and leadership topics.
+
+═══════════════════════════════════════
+PROJECT OVERVIEW
+═══════════════════════════════════════
+
+The app has two phases:
+1. A backend data pipeline that reads podcast transcripts, extracts claims using Claude AI, compares claims across guests, and identifies genuine contradictions.
+2. A React frontend where users can browse, filter, and explore those contradictions in a clean card-based UI.
+
+The goal is to answer: "What does Guest A say about hiring that directly contradicts what Guest B says?" — surfaced automatically across hundreds of episodes.
+
+═══════════════════════════════════════
+TECH STACK
+═══════════════════════════════════════
+
+Frontend: React (with Vite), Tailwind CSS
+Backend: Node.js with Express
+AI: Anthropic Claude API (model: claude-sonnet-4-20250514)
+Data store: JSON files (claims.json, contradictions.json) — no database needed
+Data source: Lenny's Podcast transcript markdown files from GitHub
+
+═══════════════════════════════════════
+STEP 1: DATA SETUP
+═══════════════════════════════════════
+
+Clone the dataset repository:
+  git clone https://github.com/LennysNewsletter/lennys-newsletterpodcastdata
+
+The /podcasts directory contains markdown files. Each file is a full podcast transcript. The filename and content include the guest name and episode topic.
+
+Also load index.json from the repo root — it contains structured metadata: episode title, guest name, date, description. Use this to enrich each transcript with guest name and episode URL.
+
+═══════════════════════════════════════
+STEP 2: BACKEND PIPELINE SCRIPTS
+═══════════════════════════════════════
+
+Build two Node.js scripts that run sequentially. These are one-time data processing scripts, not part of the live server.
+
+---
+
+SCRIPT 1: extract-claims.js
+
+Purpose: Read every transcript file, send it to Claude, extract structured claims, save all results to data/claims.json.
+
+Logic:
+- Loop through every .md file in /podcasts
+- For each file, look up the guest name and episode metadata from index.json
+- Send the transcript content to Claude API with this exact system prompt:
+
+  "You are a research assistant analyzing podcast transcripts. Your job is to extract the most opinionated, specific, and actionable pieces of advice the guest gives — focusing on claims that could plausibly conflict with advice from other experts. Avoid vague platitudes. Prioritize concrete stances on: hiring, firing, prioritization, roadmapping, company culture, growth strategy, metrics, fundraising, AI, team structure, leadership, and product strategy. For each claim, return a JSON object with these exact fields: topic (a short 2–4 word label in lowercase, e.g. 'hiring senior people', 'roadmap prioritization', 'growth vs retention'), claim (a single declarative sentence summarizing the guest's stance — write it as if the guest is making a bold assertion), quote (the best supporting verbatim quote from the transcript, maximum 60 words), guest (the guest's full name), episode_title (the episode title from metadata). Extract between 4 and 8 claims. Return a valid JSON array and nothing else."
+
+- Pass the transcript text as the user message, along with the guest name and episode title in the prompt context
+- Parse the JSON response
+- Append each claim object to a master array
+- After all files are processed, write the full array to data/claims.json
+- Log progress to console (e.g., "Processed 12/50: Shreyas Doshi — 8 claims extracted")
+- Handle API errors gracefully: if a file fails, log the error and continue to the next file rather than crashing
+
+Output format of data/claims.json:
+[
+  {
+    "id": "claim_001",
+    "guest": "Shreyas Doshi",
+    "episode_title": "The four types of product work",
+    "topic": "roadmap prioritization",
+    "claim": "Most PMs spend too much time on output metrics and not enough time on input metrics.",
+    "quote": "The problem is that everyone optimizes for the thing they can measure easily, which is almost always the wrong thing.",
+    "source_file": "podcasts/shreyas-doshi.md"
+  },
+  ...
+]
+
+---
+
+SCRIPT 2: detect-contradictions.js
+
+Purpose: Read claims.json, group claims by topic, compare claims from different guests within each topic using Claude, identify genuine contradictions, save results to data/contradictions.json.
+
+Logic:
+- Load data/claims.json
+- Group claims by their "topic" field — use fuzzy grouping so that "hiring engineers" and "hiring senior engineers" get merged into one topic group. You can do this by asking Claude to normalize all topic labels into canonical forms first, or by using simple string similarity.
+- For each topic group that has claims from at least 2 different guests:
+  - Generate all pairwise combinations of claims (Guest A claim vs Guest B claim)
+  - For each pair, send both claims to Claude API with this exact system prompt:
+
+  "You are an expert at identifying intellectual disagreements. You will be shown two pieces of advice from two different product and business experts on the same general topic. Your job is to determine whether these represent a genuine contradiction — meaning the two guests would actually disagree if they were in the same room, and one of them would push back on the other's advice. This is NOT a contradiction if: they are talking about different contexts, they are complementary ideas, one is more specific than the other, or they are just using different language for the same idea. This IS a contradiction if: following one piece of advice would conflict with following the other, one guest explicitly or implicitly rejects the approach the other recommends, or a practitioner would have to choose between them. Return a JSON object with these exact fields: is_contradiction (boolean), confidence (a float from 0.0 to 1.0 — only mark above 0.7 if the contradiction is clear and substantive), tension_summary (a single punchy sentence describing what the disagreement is actually about — write it as a conflict, e.g. 'Hire for raw talent vs. hire for culture fit first'), guest_a_position (one sentence distilling Guest A's stance), guest_b_position (one sentence distilling Guest B's stance). Return valid JSON only."
+
+  - Only keep contradictions where is_contradiction is true AND confidence >= 0.65
+  - Deduplicate: if Guest A vs Guest B already has a high-confidence contradiction on this topic, skip lower-confidence pairs
+- Write all results to data/contradictions.json
+- Log how many contradictions were found per topic
+
+Output format of data/contradictions.json:
+[
+  {
+    "id": "contradiction_001",
+    "topic": "hiring",
+    "canonical_topic": "Hiring Philosophy",
+    "confidence": 0.89,
+    "tension_summary": "Hire for raw talent vs. hire for culture fit first",
+    "guest_a": {
+      "name": "Shreyas Doshi",
+      "position": "Hire the most talented person you can find, even if they're a poor culture fit — culture can be learned, talent cannot.",
+      "quote": "I'd take a brilliant jerk over a mediocre team player nine times out of ten in a startup context.",
+      "episode_title": "The four types of product work"
+    },
+    "guest_b": {
+      "name": "Claire Vo",
+      "position": "Culture fit should be a hard filter before evaluating talent, because one bad hire can poison a team.",
+      "quote": "Skills are trainable. Attitude is not. And a team that doesn't trust each other ships nothing.",
+      "episode_title": "Building high-performing product teams"
+    }
+  },
+  ...
+]
+
+═══════════════════════════════════════
+STEP 3: EXPRESS API SERVER
+═══════════════════════════════════════
+
+Build server.js — a simple Express server that reads from the pre-generated JSON files and serves the frontend.
+
+Endpoints:
+
+GET /api/contradictions
+- Returns all contradictions from contradictions.json
+- Supports query param: ?topic=hiring (case-insensitive filter on canonical_topic)
+- Supports query param: ?confidence=high (filters to confidence >= 0.80)
+- Supports query param: ?guest=Shreyas+Doshi (returns contradictions featuring this guest)
+
+GET /api/topics
+- Returns a deduplicated, sorted list of all canonical_topic values with counts
+- Response: [{ "topic": "Hiring Philosophy", "count": 7 }, ...]
+
+GET /api/stats
+- Returns summary stats: total_contradictions, total_guests_featured, total_topics, highest_confidence_topic
+
+GET /api/contradictions/:id
+- Returns a single contradiction by id with full detail
+
+The server should also serve the React frontend build from /client/dist in production.
+
+═══════════════════════════════════════
+STEP 4: REACT FRONTEND
+═══════════════════════════════════════
+
+Build a single-page React app in /client using Vite and Tailwind CSS.
+
+---
+
+DESIGN LANGUAGE:
+
+- Background: near-black (#0f0f0f)
+- Card background: dark gray (#1a1a1a)
+- Border: subtle (#2a2a2a)
+- Accent color for tension/contradiction: warm red (#ef4444) or orange (#f97316)
+- Text: off-white (#f5f5f5) for primary, gray (#9ca3af) for secondary
+- Font: Inter or system-ui
+- Aesthetic: clean, editorial, data-forward — think Linear meets a research tool
+- Mobile responsive
+
+---
+
+COMPONENTS TO BUILD:
+
+1. Header
+- App name: "Advice Contradiction Detector"
+- Subtitle: "Where Lenny's guests disagree — AI-analyzed across 300+ episodes"
+- Stats row: [X contradictions found] · [X topics] · [X guests featured]
+
+2. FilterBar
+- Row of pill/chip buttons for each topic (from /api/topics)
+- "All" chip selected by default
+- Selecting a topic filters the card grid
+- Also include a confidence toggle: "All" / "High confidence only"
+- Search box to filter by guest name
+
+3. ContradictionCard (the main unit of the UI)
+
+Each card displays:
+- Top: topic pill (e.g., "Hiring Philosophy") + confidence badge (e.g., "89% confident")
+- Middle: two-column layout
+  - Left column: Guest A name (bold) + their position (1 sentence) + small episode title in gray
+  - Center: a vertical "VS" divider in red/orange
+  - Right column: Guest B name (bold) + their position (1 sentence) + small episode title in gray
+- Bottom: tension_summary in italics — this is the punchy one-line description of what they disagree about
+- "Expand" button or the whole card is clickable
+
+On mobile: stack the two guests vertically instead of side by side.
+
+4. ExpandedContradictionModal (opens when card is clicked)
+
+Full detail view:
+- Topic and confidence at top
+- Tension summary in large text
+- Guest A section: full name, episode title (linked), their full quote in a blockquote styled element
+- Guest B section: same
+- "Why this contradicts" section: show the tension_summary as a highlighted callout
+- Close button
+- Share button: copies a formatted text to clipboard like:
+  "💥 [Guest A] vs [Guest B] on [topic]: [tension_summary] — via Advice Contradiction Detector"
+
+5. EmptyState
+- If no contradictions match the current filters, show a friendly empty state with a message
+
+---
+
+LAYOUT:
+
+- FilterBar sticks near the top (not fixed, just visually prominent)
+- Below: masonry or 2-column responsive grid of ContradictionCards
+- Load all contradictions on mount, filter client-side (fast, no pagination needed for hackathon scale)
+
+---
+
+DATA FETCHING:
+
+- On app load, fetch /api/contradictions and /api/topics and /api/stats in parallel
+- Store in React state
+- Filtering is done client-side on the fetched data
+
+═══════════════════════════════════════
+STEP 5: ENVIRONMENT & CONFIG
+═══════════════════════════════════════
+
+Create a .env file with:
+  ANTHROPIC_API_KEY=your_key_here
+
+The pipeline scripts and server should read the API key from process.env.ANTHROPIC_API_KEY using dotenv.
+
+Add a .env.example file with the key name but no value.
+
+Add a README.md with:
+1. What the app does (2–3 sentences)
+2. Setup instructions: clone repo, npm install, add .env, run extract-claims.js, run detect-contradictions.js, then npm run dev
+3. A note that the pipeline scripts only need to be run once — the frontend reads from pre-generated JSON
+
+═══════════════════════════════════════
+STEP 6: PACKAGE.JSON SCRIPTS
+═══════════════════════════════════════
+
+Add these scripts:
+- "extract": "node scripts/extract-claims.js"
+- "detect": "node scripts/detect-contradictions.js"
+- "pipeline": "npm run extract && npm run detect"
+- "dev": runs both Express server and Vite frontend dev server concurrently
+- "build": builds the React frontend
+- "start": runs Express server serving the built frontend
+
+═══════════════════════════════════════
+BUILD ORDER
+═══════════════════════════════════════
+
+Please use Plan mode first. Build in this order:
+1. Project scaffolding (folder structure, package.json, .env setup)
+2. extract-claims.js script
+3. detect-contradictions.js script
+4. Express API server
+5. React frontend — components in order: Header → FilterBar → ContradictionCard → ExpandedContradictionModal → wire everything together
+6. Final pass: mobile responsiveness, error states, empty states

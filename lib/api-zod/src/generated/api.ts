@@ -14,3 +14,91 @@ import * as zod from "zod";
 export const HealthCheckResponse = zod.object({
   status: zod.string(),
 });
+
+/**
+ * Returns all contradictions, with optional filters
+ * @summary List all contradictions
+ */
+export const ListContradictionsQueryParams = zod.object({
+  topic: zod.coerce
+    .string()
+    .optional()
+    .describe("Filter by canonical topic (case-insensitive)"),
+  confidence: zod
+    .enum(["high", "all"])
+    .optional()
+    .describe("high = confidence >= 0.80, all = no filter"),
+  guest: zod.coerce
+    .string()
+    .optional()
+    .describe("Filter contradictions featuring this guest name"),
+});
+
+export const ListContradictionsResponseItem = zod.object({
+  id: zod.string(),
+  topic: zod.string(),
+  canonical_topic: zod.string(),
+  confidence: zod.number(),
+  tension_summary: zod.string(),
+  guest_a: zod.object({
+    name: zod.string(),
+    position: zod.string(),
+    quote: zod.string(),
+    episode_title: zod.string(),
+  }),
+  guest_b: zod.object({
+    name: zod.string(),
+    position: zod.string(),
+    quote: zod.string(),
+    episode_title: zod.string(),
+  }),
+});
+export const ListContradictionsResponse = zod.array(
+  ListContradictionsResponseItem,
+);
+
+/**
+ * @summary Get contradiction by ID
+ */
+export const GetContradictionParams = zod.object({
+  id: zod.coerce.string(),
+});
+
+export const GetContradictionResponse = zod.object({
+  id: zod.string(),
+  topic: zod.string(),
+  canonical_topic: zod.string(),
+  confidence: zod.number(),
+  tension_summary: zod.string(),
+  guest_a: zod.object({
+    name: zod.string(),
+    position: zod.string(),
+    quote: zod.string(),
+    episode_title: zod.string(),
+  }),
+  guest_b: zod.object({
+    name: zod.string(),
+    position: zod.string(),
+    quote: zod.string(),
+    episode_title: zod.string(),
+  }),
+});
+
+/**
+ * @summary List all canonical topics with counts
+ */
+export const ListTopicsResponseItem = zod.object({
+  topic: zod.string(),
+  count: zod.number(),
+});
+export const ListTopicsResponse = zod.array(ListTopicsResponseItem);
+
+/**
+ * @summary Get summary statistics
+ */
+export const GetStatsResponse = zod.object({
+  total_contradictions: zod.number(),
+  total_guests_featured: zod.number(),
+  total_topics: zod.number(),
+  highest_confidence_topic: zod.string(),
+});

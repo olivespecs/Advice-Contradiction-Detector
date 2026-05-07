@@ -6,4 +6,11 @@
  * OpenAPI spec version: 0.1.0
  */
 
+export * from "./contradiction";
+export * from "./errorResponse";
+export * from "./guestPosition";
 export * from "./healthStatus";
+export * from "./listContradictionsConfidence";
+export * from "./listContradictionsParams";
+export * from "./stats";
+export * from "./topicCount";

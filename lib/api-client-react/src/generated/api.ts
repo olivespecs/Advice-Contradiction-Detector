@@ -13,7 +13,14 @@ import type {
   UseQueryResult,
 } from "@tanstack/react-query";
 
-import type { HealthStatus } from "./api.schemas";
+import type {
+  Contradiction,
+  ErrorResponse,
+  HealthStatus,
+  ListContradictionsParams,
+  Stats,
+  TopicCount,
+} from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
 import type { ErrorType } from "../custom-fetch";
@@ -92,6 +99,331 @@ export function useHealthCheck<
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
   const queryOptions = getHealthCheckQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * Returns all contradictions, with optional filters
+ * @summary List all contradictions
+ */
+export const getListContradictionsUrl = (params?: ListContradictionsParams) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? "null" : value.toString());
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0
+    ? `/api/contradictions?${stringifiedParams}`
+    : `/api/contradictions`;
+};
+
+export const listContradictions = async (
+  params?: ListContradictionsParams,
+  options?: RequestInit,
+): Promise<Contradiction[]> => {
+  return customFetch<Contradiction[]>(getListContradictionsUrl(params), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListContradictionsQueryKey = (
+  params?: ListContradictionsParams,
+) => {
+  return [`/api/contradictions`, ...(params ? [params] : [])] as const;
+};
+
+export const getListContradictionsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listContradictions>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListContradictionsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listContradictions>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getListContradictionsQueryKey(params);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof listContradictions>>
+  > = ({ signal }) => listContradictions(params, { signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listContradictions>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListContradictionsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listContradictions>>
+>;
+export type ListContradictionsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all contradictions
+ */
+
+export function useListContradictions<
+  TData = Awaited<ReturnType<typeof listContradictions>>,
+  TError = ErrorType<unknown>,
+>(
+  params?: ListContradictionsParams,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof listContradictions>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListContradictionsQueryOptions(params, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get contradiction by ID
+ */
+export const getGetContradictionUrl = (id: string) => {
+  return `/api/contradictions/${id}`;
+};
+
+export const getContradiction = async (
+  id: string,
+  options?: RequestInit,
+): Promise<Contradiction> => {
+  return customFetch<Contradiction>(getGetContradictionUrl(id), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetContradictionQueryKey = (id: string) => {
+  return [`/api/contradictions/${id}`] as const;
+};
+
+export const getGetContradictionQueryOptions = <
+  TData = Awaited<ReturnType<typeof getContradiction>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getContradiction>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetContradictionQueryKey(id);
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof getContradiction>>
+  > = ({ signal }) => getContradiction(id, { signal, ...requestOptions });
+
+  return {
+    queryKey,
+    queryFn,
+    enabled: !!id,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof getContradiction>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetContradictionQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getContradiction>>
+>;
+export type GetContradictionQueryError = ErrorType<ErrorResponse>;
+
+/**
+ * @summary Get contradiction by ID
+ */
+
+export function useGetContradiction<
+  TData = Awaited<ReturnType<typeof getContradiction>>,
+  TError = ErrorType<ErrorResponse>,
+>(
+  id: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<typeof getContradiction>>,
+      TError,
+      TData
+    >;
+    request?: SecondParameter<typeof customFetch>;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetContradictionQueryOptions(id, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary List all canonical topics with counts
+ */
+export const getListTopicsUrl = () => {
+  return `/api/topics`;
+};
+
+export const listTopics = async (
+  options?: RequestInit,
+): Promise<TopicCount[]> => {
+  return customFetch<TopicCount[]>(getListTopicsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getListTopicsQueryKey = () => {
+  return [`/api/topics`] as const;
+};
+
+export const getListTopicsQueryOptions = <
+  TData = Awaited<ReturnType<typeof listTopics>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listTopics>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getListTopicsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof listTopics>>> = ({
+    signal,
+  }) => listTopics({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof listTopics>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type ListTopicsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof listTopics>>
+>;
+export type ListTopicsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary List all canonical topics with counts
+ */
+
+export function useListTopics<
+  TData = Awaited<ReturnType<typeof listTopics>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<typeof listTopics>>,
+    TError,
+    TData
+  >;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getListTopicsQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+/**
+ * @summary Get summary statistics
+ */
+export const getGetStatsUrl = () => {
+  return `/api/stats`;
+};
+
+export const getStats = async (options?: RequestInit): Promise<Stats> => {
+  return customFetch<Stats>(getGetStatsUrl(), {
+    ...options,
+    method: "GET",
+  });
+};
+
+export const getGetStatsQueryKey = () => {
+  return [`/api/stats`] as const;
+};
+
+export const getGetStatsQueryOptions = <
+  TData = Awaited<ReturnType<typeof getStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}) => {
+  const { query: queryOptions, request: requestOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getGetStatsQueryKey();
+
+  const queryFn: QueryFunction<Awaited<ReturnType<typeof getStats>>> = ({
+    signal,
+  }) => getStats({ signal, ...requestOptions });
+
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof getStats>>,
+    TError,
+    TData
+  > & { queryKey: QueryKey };
+};
+
+export type GetStatsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getStats>>
+>;
+export type GetStatsQueryError = ErrorType<unknown>;
+
+/**
+ * @summary Get summary statistics
+ */
+
+export function useGetStats<
+  TData = Awaited<ReturnType<typeof getStats>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<Awaited<ReturnType<typeof getStats>>, TError, TData>;
+  request?: SecondParameter<typeof customFetch>;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+  const queryOptions = getGetStatsQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;

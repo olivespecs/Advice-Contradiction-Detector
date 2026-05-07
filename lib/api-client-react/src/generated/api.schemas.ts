@@ -8,3 +8,59 @@
 export interface HealthStatus {
   status: string;
 }
+
+export interface GuestPosition {
+  name: string;
+  position: string;
+  quote: string;
+  episode_title: string;
+}
+
+export interface Contradiction {
+  id: string;
+  topic: string;
+  canonical_topic: string;
+  confidence: number;
+  tension_summary: string;
+  guest_a: GuestPosition;
+  guest_b: GuestPosition;
+}
+
+export interface TopicCount {
+  topic: string;
+  count: number;
+}
+
+export interface Stats {
+  total_contradictions: number;
+  total_guests_featured: number;
+  total_topics: number;
+  highest_confidence_topic: string;
+}
+
+export interface ErrorResponse {
+  error: string;
+}
+
+export type ListContradictionsParams = {
+  /**
+   * Filter by canonical topic (case-insensitive)
+   */
+  topic?: string;
+  /**
+   * high = confidence >= 0.80, all = no filter
+   */
+  confidence?: ListContradictionsConfidence;
+  /**
+   * Filter contradictions featuring this guest name
+   */
+  guest?: string;
+};
+
+export type ListContradictionsConfidence =
+  (typeof ListContradictionsConfidence)[keyof typeof ListContradictionsConfidence];
+
+export const ListContradictionsConfidence = {
+  high: "high",
+  all: "all",
+} as const;

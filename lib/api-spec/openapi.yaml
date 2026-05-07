@@ -10,6 +10,8 @@ servers:
 tags:
   - name: health
     description: Health operations
+  - name: contradictions
+    description: Contradiction data operations
 paths:
   /healthz:
     get:
@@ -24,6 +26,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /contradictions:
+    get:
+      operationId: listContradictions
+      tags: [contradictions]
+      summary: List all contradictions
+      description: Returns all contradictions, with optional filters
+      parameters:
+        - name: topic
+          in: query
+          schema:
+            type: string
+          description: Filter by canonical topic (case-insensitive)
+        - name: confidence
+          in: query
+          schema:
+            type: string
+            enum: [high, all]
+          description: "high = confidence >= 0.80, all = no filter"
+        - name: guest
+          in: query
+          schema:
+            type: string
+          description: Filter contradictions featuring this guest name
+      responses:
+        "200":
+          description: List of contradictions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Contradiction"
+
+  /contradictions/{id}:
+    get:
+      operationId: getContradiction
+      tags: [contradictions]
+      summary: Get contradiction by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Contradiction detail
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Contradiction"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /topics:
+    get:
+      operationId: listTopics
+      tags: [contradictions]
+      summary: List all canonical topics with counts
+      responses:
+        "200":
+          description: Topics list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TopicCount"
+
+  /stats:
+    get:
+      operationId: getStats
+      tags: [contradictions]
+      summary: Get summary statistics
+      responses:
+        "200":
+          description: Stats summary
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Stats"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +123,81 @@ components:
       required:
         - status
 
+    GuestPosition:
+      type: object
+      properties:
+        name:
+          type: string
+        position:
+          type: string
+        quote:
+          type: string
+        episode_title:
+          type: string
+      required:
+        - name
+        - position
+        - quote
+        - episode_title
+
+    Contradiction:
+      type: object
+      properties:
+        id:
+          type: string
+        topic:
+          type: string
+        canonical_topic:
+          type: string
+        confidence:
+          type: number
+        tension_summary:
+          type: string
+        guest_a:
+          $ref: "#/components/schemas/GuestPosition"
+        guest_b:
+          $ref: "#/components/schemas/GuestPosition"
+      required:
+        - id
+        - topic
+        - canonical_topic
+        - confidence
+        - tension_summary
+        - guest_a
+        - guest_b
+
+    TopicCount:
+      type: object
+      properties:
+        topic:
+          type: string
+        count:
+          type: integer
+      required:
+        - topic
+        - count
+
+    Stats:
+      type: object
+      properties:
+        total_contradictions:
+          type: integer
+        total_guests_featured:
+          type: integer
+        total_topics:
+          type: integer
+        highest_confidence_topic:
+          type: string
+      required:
+        - total_contradictions
+        - total_guests_featured
+        - total_topics
+        - highest_confidence_topic
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error

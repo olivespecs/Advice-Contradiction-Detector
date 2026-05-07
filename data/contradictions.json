@@ -1,0 +1,230 @@
+[
+  {
+    "id": "contradiction_001",
+    "topic": "hiring engineers",
+    "canonical_topic": "Hiring Philosophy",
+    "confidence": 0.92,
+    "tension_summary": "Hire for raw talent vs. culture fit first",
+    "guest_a": {
+      "name": "Shreyas Doshi",
+      "position": "Hire the most talented person you can find, even if they're a poor culture fit — culture can be learned, talent cannot.",
+      "quote": "I'd take a brilliant jerk over a mediocre team player nine times out of ten in a startup context. Talent is the scarcest resource.",
+      "episode_title": "The four types of product work"
+    },
+    "guest_b": {
+      "name": "Claire Vo",
+      "position": "Culture fit should be a hard filter before evaluating talent, because one bad hire can poison a team.",
+      "quote": "Skills are trainable. Attitude is not. And a team that doesn't trust each other ships nothing.",
+      "episode_title": "Building high-performing product teams"
+    }
+  },
+  {
+    "id": "contradiction_002",
+    "topic": "product roadmapping",
+    "canonical_topic": "Roadmap Strategy",
+    "confidence": 0.87,
+    "tension_summary": "Ship fast and iterate vs. invest in deep upfront thinking",
+    "guest_a": {
+      "name": "Lenny Rachitsky",
+      "position": "The best teams ship fast, learn from users, and course-correct — not spend months planning the perfect roadmap.",
+      "quote": "Your first roadmap is almost always wrong. The faster you can invalidate it, the better.",
+      "episode_title": "How the best PMs do roadmapping"
+    },
+    "guest_b": {
+      "name": "Marty Cagan",
+      "position": "Shipping fast without deep discovery just means shipping the wrong thing faster — discovery work is non-negotiable.",
+      "quote": "The problem isn't execution speed. Most teams are building the wrong thing efficiently. Discovery is where the real work happens.",
+      "episode_title": "Inspired: rethinking product management"
+    }
+  },
+  {
+    "id": "contradiction_003",
+    "topic": "growth strategy",
+    "canonical_topic": "Growth Strategy",
+    "confidence": 0.89,
+    "tension_summary": "Paid acquisition is a trap vs. fastest path to scale",
+    "guest_a": {
+      "name": "Andrew Chen",
+      "position": "Paid acquisition is often a crutch that masks weak product-market fit and destroys unit economics at scale.",
+      "quote": "If you need to keep paying to acquire users, you haven't actually built something people want badly enough.",
+      "episode_title": "The cold start problem"
+    },
+    "guest_b": {
+      "name": "Brian Balfour",
+      "position": "Paid acquisition, done right, is the highest-leverage growth lever for most B2C products — the key is modeling your LTV/CAC correctly.",
+      "quote": "Dismissing paid because of bad unit economics is like dismissing hiring because a bad hire is expensive. Get your model right first.",
+      "episode_title": "Building a growth machine"
+    }
+  },
+  {
+    "id": "contradiction_004",
+    "topic": "metrics and measurement",
+    "canonical_topic": "Metrics & Measurement",
+    "confidence": 0.85,
+    "tension_summary": "NPS is a vanity metric vs. best predictor of growth",
+    "guest_a": {
+      "name": "Fareed Mosavat",
+      "position": "NPS is a lagging vanity metric that tells you almost nothing actionable — focus on retention cohorts and feature engagement instead.",
+      "quote": "By the time NPS drops, the damage is already done. It's not a leading indicator of anything useful.",
+      "episode_title": "Retention as a growth lever"
+    },
+    "guest_b": {
+      "name": "Rahul Vohra",
+      "position": "NPS, measured correctly and tracked over time, is the single best predictor of long-term retention and organic growth.",
+      "quote": "Companies that obsess over NPS consistently outgrow competitors. It's not the metric, it's how you use it.",
+      "episode_title": "Building a product people love"
+    }
+  },
+  {
+    "id": "contradiction_005",
+    "topic": "team structure",
+    "canonical_topic": "Team Structure & Org Design",
+    "confidence": 0.81,
+    "tension_summary": "Autonomous squads vs. strong central coordination",
+    "guest_a": {
+      "name": "Camille Fournier",
+      "position": "Autonomous, empowered squads with end-to-end ownership outperform centrally coordinated teams at every scale.",
+      "quote": "Coordination overhead is the hidden killer of velocity. The more you can push decision-making to the team level, the faster you move.",
+      "episode_title": "Engineering management at scale"
+    },
+    "guest_b": {
+      "name": "Julie Zhuo",
+      "position": "Without strong cross-team coordination and shared context, autonomous squads optimize locally and destroy coherent user experiences.",
+      "quote": "Everyone rowing independently doesn't get you to the same destination faster — you end up with ten boats going in ten directions.",
+      "episode_title": "The making of a manager"
+    }
+  },
+  {
+    "id": "contradiction_006",
+    "topic": "leadership style",
+    "canonical_topic": "Leadership Style",
+    "confidence": 0.78,
+    "tension_summary": "Be decisive and directive vs. lead through questions",
+    "guest_a": {
+      "name": "Gokul Rajaram",
+      "position": "Great leaders make crisp, fast decisions and give their teams clarity — ambiguity and endless process are the enemies of execution.",
+      "quote": "The cost of a wrong decision is almost always lower than the cost of no decision. Leaders who hedge lose their teams.",
+      "episode_title": "Decision-making at scale"
+    },
+    "guest_b": {
+      "name": "Lara Hogan",
+      "position": "The best leaders resist the urge to provide answers — asking the right questions builds team capability and surfaces better solutions.",
+      "quote": "Every time you give the answer, you've stolen a learning opportunity. The leader's job is to make their team smarter, not to be the smartest person in the room.",
+      "episode_title": "Resilient management"
+    }
+  },
+  {
+    "id": "contradiction_007",
+    "topic": "fundraising strategy",
+    "canonical_topic": "Fundraising & Investor Relations",
+    "confidence": 0.83,
+    "tension_summary": "Raise as much as possible vs. stay lean to preserve focus",
+    "guest_a": {
+      "name": "Elad Gil",
+      "position": "In uncertain markets, raise as much capital as you can when the window is open — runway is the most valuable asset a startup has.",
+      "quote": "You're not being disciplined by raising less — you're being naive. Capital markets close fast and stay closed for years.",
+      "episode_title": "High growth handbook"
+    },
+    "guest_b": {
+      "name": "David Rusenko",
+      "position": "Raising too much capital is one of the most common ways startups kill themselves — it removes urgency, inflates teams, and delays hard decisions.",
+      "quote": "Constraints breed creativity. The startups I've seen fail from too much money far outnumber those that failed from too little.",
+      "episode_title": "Building Weebly from zero"
+    }
+  },
+  {
+    "id": "contradiction_008",
+    "topic": "AI in product development",
+    "canonical_topic": "AI in Product Development",
+    "confidence": 0.88,
+    "tension_summary": "AI replaces PMs vs. AI makes PMs irreplaceable",
+    "guest_a": {
+      "name": "Sachin Rekhi",
+      "position": "AI will fundamentally replace the execution layer of product management — PMs who don't adapt will find their roles eliminated within a decade.",
+      "quote": "The PM job has always been about coordination and synthesis. AI does both faster and cheaper. The question is whether there's anything left after that.",
+      "episode_title": "The future of product management"
+    },
+    "guest_b": {
+      "name": "Gibson Biddle",
+      "position": "AI makes the strategic and empathetic parts of product management more valuable, not less — judgment and taste are the moat.",
+      "quote": "AI can surface patterns. It cannot tell you which patterns matter to real humans or make the moral judgment calls that products require at scale.",
+      "episode_title": "Product strategy in the AI era"
+    }
+  },
+  {
+    "id": "contradiction_009",
+    "topic": "company culture",
+    "canonical_topic": "Company Culture",
+    "confidence": 0.76,
+    "tension_summary": "Culture is built top-down vs. it emerges from the team",
+    "guest_a": {
+      "name": "Ben Horowitz",
+      "position": "Culture is primarily set by the founder and must be deliberately codified and enforced — it doesn't emerge organically at scale.",
+      "quote": "If you don't define the culture, someone else will, and you won't like what you get. This is too important to leave to chance.",
+      "episode_title": "What you do is who you are"
+    },
+    "guest_b": {
+      "name": "Kim Scott",
+      "position": "Imposed cultures are almost always bullshit — authentic culture emerges from the real behaviors leaders model daily, not from values posters.",
+      "quote": "The moment culture becomes a program, it stops being culture. People are too smart to believe what they're told if it doesn't match what they see.",
+      "episode_title": "Radical candor at scale"
+    }
+  },
+  {
+    "id": "contradiction_010",
+    "topic": "prioritization frameworks",
+    "canonical_topic": "Prioritization",
+    "confidence": 0.80,
+    "tension_summary": "Quantitative scoring models vs. gut-driven conviction",
+    "guest_a": {
+      "name": "Teresa Torres",
+      "position": "Quantitative prioritization frameworks remove bias and force teams to be explicit about their assumptions — gut instinct is just bias with good PR.",
+      "quote": "RICE, ICE, impact-effort matrices — these aren't perfect, but they make your reasoning legible and improve over time. Gut calls don't.",
+      "episode_title": "Continuous discovery habits"
+    },
+    "guest_b": {
+      "name": "Paul Adams",
+      "position": "Over-reliance on scoring frameworks creates false precision and penalizes bold bets — the best product decisions are driven by conviction, not spreadsheets.",
+      "quote": "The most important product bets can't be scored in advance. If they could, your competitors would be making them too.",
+      "episode_title": "Product strategy at Intercom"
+    }
+  },
+  {
+    "id": "contradiction_011",
+    "topic": "customer research",
+    "canonical_topic": "Customer Research Methods",
+    "confidence": 0.84,
+    "tension_summary": "Quantitative data over qualitative vs. user interviews first",
+    "guest_a": {
+      "name": "Avinash Kaushik",
+      "position": "Qualitative research is confirmatory theater — if you don't have statistical significance, you're just collecting anecdotes that confirm what you already believe.",
+      "quote": "Five user interviews don't tell you what your product does. They tell you what five articulate people, who agreed to talk to you, think they do.",
+      "episode_title": "Data-driven product decisions"
+    },
+    "guest_b": {
+      "name": "Indi Young",
+      "position": "Quantitative data tells you what happened — only qualitative research tells you why, and why is the only thing worth acting on.",
+      "quote": "You can A/B test your way to local maxima forever. Understanding intent is what gets you to the next mountain range entirely.",
+      "episode_title": "Mental models for product discovery"
+    }
+  },
+  {
+    "id": "contradiction_012",
+    "topic": "firing decisions",
+    "canonical_topic": "Hiring Philosophy",
+    "confidence": 0.77,
+    "tension_summary": "Fire fast when it's not working vs. invest heavily in coaching first",
+    "guest_a": {
+      "name": "Keith Rabois",
+      "position": "The biggest mistake managers make is waiting too long to fire — most people know within weeks whether someone will work out.",
+      "quote": "If you're asking 'should I fire this person,' the answer is almost always yes. The question answered itself.",
+      "episode_title": "The anatomy of a great executive"
+    },
+    "guest_b": {
+      "name": "Patty McCord",
+      "position": "Most performance failures are organizational or contextual, not individual — firing without investing in coaching is lazy management.",
+      "quote": "Nine out of ten times, when someone is underperforming, the manager hasn't been clear about what success looks like. That's a leadership problem, not a people problem.",
+      "episode_title": "Powerful: building a culture of freedom"
+    }
+  }
+]
