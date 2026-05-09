@@ -47,3 +47,11 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+/ruflo
+
+# Podcast data (cloned separately)
+podcasts/
+
+# Claude Code
+.claude/

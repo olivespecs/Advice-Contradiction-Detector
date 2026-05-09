@@ -1,13 +1,17 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join } from "path";
+import { join, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = join(__dirname, "..", "..");
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
-const DATA_DIR = join(process.cwd(), "data");
+const DATA_DIR = join(ROOT_DIR, "data");
 const CLAIMS_FILE = join(DATA_DIR, "claims.json");
 const OUTPUT_FILE = join(DATA_DIR, "contradictions.json");
 

@@ -1,14 +1,18 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { readFileSync, readdirSync, writeFileSync, existsSync, mkdirSync } from "fs";
-import { join, basename } from "path";
+import { join, basename, dirname } from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT_DIR = join(__dirname, "..", "..");
 
 const anthropic = new Anthropic({
   apiKey: process.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY,
   baseURL: process.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL,
 });
 
-const PODCASTS_DIR = join(process.cwd(), "podcasts");
-const DATA_DIR = join(process.cwd(), "data");
+const PODCASTS_DIR = join(ROOT_DIR, "podcasts", "podcasts");
+const DATA_DIR = join(ROOT_DIR, "data");
 const OUTPUT_FILE = join(DATA_DIR, "claims.json");
 
 interface EpisodeMeta {
@@ -30,7 +34,7 @@ interface ClaimResult {
 }
 
 function loadIndex(): Record<string, EpisodeMeta> {
-  const indexPath = join(process.cwd(), "index.json");
+  const indexPath = join(ROOT_DIR, "podcasts", "index.json");
   if (!existsSync(indexPath)) return {};
   try {
     const raw = JSON.parse(readFileSync(indexPath, "utf-8"));
